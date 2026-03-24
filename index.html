@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>母婴&玩具类目-VMI最新机会商品</title>
+    <style>
+        body { font-family: 'PingFang SC', sans-serif; background: #f4f4f7; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: #ee4d2d; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .desc-box { background: rgba(255,255,255,0.2); padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 14px; line-height: 1.6; }
+        .filter-section { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        
+        /* 👇 临时隐藏：待定筛选框（不删除代码） */
+        #modelCountFilter {
+            display: none;
+        }
+
+        .reset-btn { 
+            padding: 8px 16px; 
+            background: #fff; 
+            border: 1px solid #ee4d2d; 
+            color: #ee4d2d; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: all 0.2s;
+        }
+        .reset-btn:hover {
+            background: #ee4d2d;
+            color: white;
+        }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; transition: 0.3s; position: relative; display: flex; flex-direction: column; }
+        .judge-tag { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .bg-p0 { background: #d4edda; color: #155724; }
+        .bg-p1 { background: #d1ecf1; color: #0c5460; }
+        .special-tag { position: absolute; top: 10px; right: 10px; background: linear-gradient(90deg, #ff7a18, #e52e71); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; z-index: 10; }
+        .img-container { width: 100%; height: 220px; background: #fff; overflow: hidden; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
+        .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .title { font-weight: bold; font-size: 15px; margin-bottom: 10px; height: 38px; line-height: 19px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-all; }
+        .price-variant-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .price { color: #ee4d2d; font-size: 22px; font-weight: bold; flex-shrink: 0; }
+        .variant { font-size: 13px; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: 10px; }
+        .invite-row { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+        .model-count-tag { background: #fff2f0; border: 1px solid #ffccc7; color: #cf1322; font-size: 12px; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+        .invite-id-box { flex-grow: 1; border: 2px dashed #ee4d2d; padding: 4px; text-align: center; font-size: 16px; font-weight: bold; color: #ee4d2d; border-radius: 6px; cursor: pointer; }
+        .footer-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 10px; margin-top: auto; }
+        .btn-link { color: #0056b3; font-weight: bold; text-decoration: none; }
+        #imageModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>母婴&玩具类目-VMI最新机会商品</h1>
+        <div class="desc-box">
+🔥备注：选好后复制对应品的邀请id到 SCS 卖家后台 -> 【商品管理】 -> 【机会商品】 -> 【输入邀请id】 -> 【点击立刻报名】 -> 即可进行提报。详情可在企微联系买手<br>
+💰高效提报：单击红框 ID 快速复制，单击红框ID可快速复制，搜索该ID报满所有型号流量翻倍！<br>
+💹价格有问题： 点击左上角“1688三档价”查看核价链接，联系买手申诉。</div>
+    </header>
+    <div class="filter-section">
+        <input type="text" id="searchInput" placeholder="搜索标题/邀请ID" oninput="debouncedFilter()">
+        <select id="l1Filter" onchange="updateL2(); updateL3(); applyFilters()"><option value="">二级类目(全部)</option></select>
+        <select id="l2Filter" onchange="updateL3(); applyFilters()"><option value="">三级类目(全部)</option></select>
+        
+        <!-- 👇 新增：四级类目筛选器（和三级完全一样逻辑） -->
+        <select id="l3Filter" onchange="applyFilters()"><option value="">四级类目(全部)</option></select>
+
+        <select id="pFilter" onchange="applyFilters()"><option value="">参考价依据(全部)</option><option value="1688三档价">1688三档价</option><option value="爆品竞价">爆品竞价</option></select>
+        
+        <!-- 👇 【新增】更新时间筛选器（和参考价依据逻辑完全一致） -->
+        <select id="dateFilter" onchange="applyFilters()"><option value="">更新时间(全部)</option></select>
+
+        <select id="tagFilter" onchange="applyFilters()"><option value="">价格档位(全部)</option></select>
+        <select id="priceRangeFilter" onchange="applyFilters()">
+            <option value="">目标价格段(全部)</option>
+            <option value="0-5">0-5</option>
+            <option value="5-10">5-10</option>
+            <option value="10-20">10-20</option>
+            <option value="20-50">20-50</option>
+            <option value="50+">50+</option>
+        </select>
+
+        
+        <!-- 该筛选框对应左下角的tag 【目前已隐藏，代码保留】 -->
+        <select id="modelCountFilter" onchange="applyFilters()">
+            <option value="">待定筛选框</option>
+        </select>
+
+        
+        <input type="number" id="minPrice" placeholder="最低价" oninput="debouncedFilter()">
+        <input type="number" id="maxPrice" placeholder="最高价" oninput="debouncedFilter()">
+        <select id="sortOrder" onchange="applyFilters()">
+            <option value="">默认排序</option>
+            <option value="priceAsc">价格升序</option>
+            <option value="priceDesc">价格降序</option>
+        </select>
+        <button class="reset-btn" onclick="resetFilters()">重置筛选</button>
+        <span id="countDisplay" style="font-weight:bold; color:#ee4d2d; margin-left:auto;"></span>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+    <div style="margin:20px; text-align:center;" id="pagination"></div>
+</div>
+<div id="imageModal" onclick="this.style.display='none'"><img id="modalImg" src=""></div>
+
+<script>
+    document.oncontextmenu = () => false;
+    document.onkeydown = (e) => {
+        if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
+            return false;
+        }
+    };
+
+    let products = [], filteredData = [], currentPage = 1;
+    const pageSize = 40;
+    const cleanId = (str) => {
+        if (!str) return "";
+        return str.toString().replace(/^['+]+/, '').replace(/["=\t]/g, '').trim();
+    };
+
+    async function loadData() {
+        try {
+            const res = await fetch('data.csv');
+            const text = await res.text();
+            products = text.split(/\r?\n/).slice(1).map((line, index) => {
+                let r = [], cur = '', q = false;
+                for (let c of line) { if (c === '"') q = !q; else if (c === ',' && !q) { r.push(cur.trim()); cur = ''; } else cur += c; }
+                r.push(cur.trim()); r.push(index);
+                return r;
+            }).filter(a => a.length >= 12);
+            initFilters();
+            // 初始化时直接加载所有三级、四级类目（不再依赖二级选中）
+            initL2Filter(); 
+            initL3Filter();
+            applyFilters();
+        } catch (e) { console.error(e); }
+    }
+
+    function checkLink(rawUrl) {
+        if (!rawUrl) { alert('❌ 无核价链接'); return; }
+        const match = rawUrl.match(/https?:\/\/[^\s]+/);
+        if (match) { window.open(match[0], '_blank'); } else { alert('❌ 链接格式无法识别'); }
+    }
+
+    const mapData = (arr) => {
+        return {
+            title: arr[0],
+            variant: arr[1],
+            price: parseFloat(arr[2]) || 0,
+            imgUrl: arr[3],
+            link: arr[4],
+            l1: arr[5],
+            l2: arr[6],
+            l3: arr[16] || "", // 新增：四级类目
+            inviteId: cleanId(arr[7]),
+            modelId: cleanId(arr[8]), 
+            link1688: arr[9],
+            judge: arr[10],
+            date: arr[11],
+            specialTag: arr[14] || "",
+            modelCount: arr[15] || ""
+        };
+    };
+
+    function render(dataList, page = 1) {
+        currentPage = page;
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
+        dataList.slice((page - 1) * pageSize, page * pageSize).forEach(arr => {
+            const item = mapData(arr);
+            const card = document.createElement('div');
+            card.className = 'card';
+card.innerHTML = `
+    <div class="judge-tag ${item.judge === 'p0' ? 'bg-p0' : 'bg-p1'}" onclick="checkLink('${item.link1688}')">${item.judge}</div>
+    ${item.specialTag ? `<div class="special-tag">${item.specialTag}</div>` : ''}
+    <div class="img-container" ondblclick="document.getElementById('modalImg').src='${item.imgUrl}'; document.getElementById('imageModal').style.display='flex';">
+        <img src="${item.imgUrl}" loading="lazy">
+    </div>
+    <div class="info">
+        <div class="title" title="${item.title}">${item.title}</div>
+        <div class="price-variant-row">
+            <span class="price">目标价¥${item.price}</span>
+            <span class="variant" title="${item.variant}">${item.variant}</span>
+        </div>
+        <div class="invite-row">
+            <div class="model-count-tag">${item.l2}</div>
+            <div class="invite-id-box" onclick="navigator.clipboard.writeText('${item.inviteId}'); alert('已复制ID: ${item.inviteId}')">${item.inviteId}</div>
+        </div>
+        <div class="footer-row">
+            <span>${item.date}</span>
+            <span style="font-weight:bold; color:#555;">${item.modelId}</span>
+            <a href="${item.link}" target="_blank" class="btn-link">Shopee链接 >>></a>
+        </div>
+    </div>`;
+            grid.appendChild(card);
+        });
+        renderPagination(dataList.length);
+    }
+
+    function renderPagination(total) {
+        const totalPages = Math.ceil(total / pageSize);
+        const p = document.getElementById('pagination');
+        p.innerHTML = `
+            <button onclick="changePage(-1)" ${currentPage===1?'disabled':''}>上一页</button>
+            <span style="margin:0 10px;">${currentPage}/${totalPages || 1}</span>
+            <button onclick="changePage(1)" ${currentPage>=totalPages?'disabled':''}>下一页</button>
+            <input type="number" id="jumpPage" style="width:50px; margin-left:10px;" placeholder="页码">
+            <button onclick="jumpToPage()">跳转</button>`;
+    }
+
+    function changePage(delta) { render(filteredData, currentPage + delta); }
+    function jumpToPage() {
+        const p = parseInt(document.getElementById('jumpPage').value);
+        if(p > 0 && p <= Math.ceil(filteredData.length/pageSize)) render(filteredData, p);
+    }
+
+    function applyFilters() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const l1 = document.getElementById('l1Filter').value;
+        const l2 = document.getElementById('l2Filter').value;
+        const l3 = document.getElementById('l3Filter').value; // 新增：四级类目
+        const p = document.getElementById('pFilter').value;
+        const dateFilter = document.getElementById('dateFilter').value; // 新增：更新时间
+        const tag = document.getElementById('tagFilter').value;
+        const min = parseFloat(document.getElementById('minPrice').value) || 0;
+        const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+        const priceRange = document.getElementById('priceRangeFilter').value;
+        const priceLevel = document.getElementById('modelCountFilter').value;
+
+        let minRange = 0, maxRange = Infinity;
+        if (priceRange) {
+            const [start, end] = priceRange.split('-');
+            if (priceRange === '50+') {
+                minRange = 50; maxRange = Infinity;
+            } else {
+                minRange = parseFloat(start) || 0;
+                maxRange = parseFloat(end) || Infinity;
+            }
+        }
+        
+        filteredData = products.filter(arr => {
+            const i = mapData(arr);
+            const isInPriceRange = i.price >= minRange && i.price <= maxRange;
+            
+            let isMatchPriceLevel = true;
+            if (priceLevel) {
+                isMatchPriceLevel = i.modelCount === priceLevel;
+            }
+
+            return (i.title.toLowerCase().includes(q) || i.inviteId.toLowerCase().includes(q)) &&
+                   (!l1 || i.l1 === l1) && 
+                   (!l2 || i.l2 === l2) && 
+                   (!l3 || i.l3 === l3) &&  // 新增：四级类目筛选
+                   (!p || i.judge === p) && 
+                   (!dateFilter || i.date === dateFilter) && // 新增：更新时间筛选
+                   (!tag || i.specialTag === tag) && 
+                   (i.price >= min && i.price <= max) && 
+                   isInPriceRange && isMatchPriceLevel;
+        });
+        
+        const sort = document.getElementById('sortOrder').value;
+        if (sort === 'priceAsc') filteredData.sort((a,b) => a[2] - b[2]);
+        else if (sort === 'priceDesc') filteredData.sort((a,b) => b[2] - a[2]);
+        
+        document.getElementById('countDisplay').innerText = `已筛选：${filteredData.length} 款`;
+        render(filteredData, 1);
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('l1Filter').value = '';
+        document.getElementById('l2Filter').value = '';
+        document.getElementById('l3Filter').value = ''; // 新增：重置四级
+        document.getElementById('pFilter').value = '';
+        document.getElementById('dateFilter').value = ''; // 新增：重置更新时间
+        document.getElementById('tagFilter').value = '';
+        document.getElementById('priceRangeFilter').value = '';
+        document.getElementById('modelCountFilter').value = '';
+        document.getElementById('minPrice').value = '';
+        document.getElementById('maxPrice').value = '';
+        document.getElementById('sortOrder').value = '';
+        // 重置后重新加载所有三级、四级类目（不再依赖二级）
+        initL2Filter(); 
+        initL3Filter();
+        applyFilters();
+    }
+
+    function initFilters() {
+        // 初始化二级类目
+        [...new Set(products.map(p => p[5]))].forEach(v => { if(v) document.getElementById('l1Filter').innerHTML += `<option value="${v}">${v}</option>`; });
+        
+        // 👇 【新增】自动加载 CSV 里的 arr[11] 到更新时间筛选器
+        [...new Set(products.map(p => p[11]?.trim()).filter(v => v))].forEach(v => {
+            document.getElementById('dateFilter').innerHTML += `<option value="${v}">${v}</option>`;
+        });
+
+        // 初始化价格档位筛选
+        [...new Set(products.map(p => p[14]?.trim()).filter(v => v))].forEach(v => { document.getElementById('tagFilter').innerHTML += `<option value="${v}">${v}</option>`; });
+        // 初始化待定筛选框
+        [...new Set(products.map(p => p[15]?.trim()).filter(v => v))].forEach(v => { 
+            document.getElementById('modelCountFilter').innerHTML += `<option value="${v}">${v}</option>`; 
+        });
+    }
+
+    // 【修改】初始化所有三级类目（不依赖二级选中）
+    function initL2Filter() {
+        const s = document.getElementById('l2Filter'); 
+        s.innerHTML = '<option value="">三级类目(全部)</option>'; 
+        [...new Set(products.map(p => p[6]))].forEach(v => { if(v) s.innerHTML += `<option value="${v}">${v}</option>`; }); 
+    }
+
+    // 【修改】初始化所有四级类目（不依赖二级/三级选中）
+    function initL3Filter() {
+        const s = document.getElementById('l3Filter'); 
+        s.innerHTML = '<option value="">四级类目(全部)</option>'; 
+        [...new Set(products.map(p => p[16]))].forEach(v => { if(v) s.innerHTML += `<option value="${v}">${v}</option>`; }); 
+    }
+
+    // 【修改】三级类目联动逻辑：选中二级时过滤，未选中时显示全部
+    function updateL2() { 
+        const l1 = document.getElementById('l1Filter').value; 
+        const s = document.getElementById('l2Filter'); 
+        s.innerHTML = '<option value="">三级类目(全部)</option>'; 
+        // 如果选中了二级类目，过滤三级；否则显示所有三级
+        const list = l1 ? products.filter(p => p[5] === l1) : products;
+        [...new Set(list.map(p => p[6]))].forEach(v => { if(v) s.innerHTML += `<option value="${v}">${v}</option>`; }); 
+        updateL3();
+    }
+
+    // 【修改】四级类目联动逻辑：选中二级/三级时过滤，未选中时显示全部
+    function updateL3() { 
+        const l1 = document.getElementById('l1Filter').value;
+        const l2 = document.getElementById('l2Filter').value;
+        const s = document.getElementById('l3Filter'); 
+        s.innerHTML = '<option value="">四级类目(全部)</option>'; 
+        
+        let list = products;
+        // 有二级选二级，有三级选三级，都没有显示全部
+        if(l1) list = list.filter(p => p[5] === l1);
+        if(l2) list = list.filter(p => p[6] === l2);
+        
+        [...new Set(list.map(p => p[16]))].forEach(v => { if(v) s.innerHTML += `<option value="${v}">${v}</option>`; }); 
+    }
+    
+    let timer; 
+    const debouncedFilter = () => { clearTimeout(timer); timer = setTimeout(applyFilters, 300); };
+    window.onload = loadData;
+</script>
+<footer style="text-align:center; color:#86868b; font-size: 11px; margin-top:80px; padding:40px;">
+    <div>Designed by Ethan Cai</div>
+    <div>ethan.cai02@shopee.com</div>
+</footer>
+</body>
+</html>
